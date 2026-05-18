@@ -2,7 +2,9 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 import type { Components } from 'react-markdown';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { slugify } from '@/lib/markdown';
 import { MermaidDiagram } from '@/components/MermaidDiagram';
@@ -17,12 +19,40 @@ const ALERT_CONFIG: Record<AlertType, {
   bgClass: string;
   labelClass: string;
 }> = {
-  NOTE:      { label: '補足',   icon: 'ℹ️',  borderClass: 'border-blue-400',    bgClass: 'bg-blue-50',    labelClass: 'text-blue-700' },
+  NOTE:      { label: '補足',   icon: 'ℹ️',  borderClass: 'border-slate-400',   bgClass: 'bg-slate-50',   labelClass: 'text-slate-600' },
   TIP:       { label: 'ヒント', icon: '💡',  borderClass: 'border-emerald-400', bgClass: 'bg-emerald-50', labelClass: 'text-emerald-700' },
-  IMPORTANT: { label: '重要',   icon: '❗',  borderClass: 'border-violet-400',  bgClass: 'bg-violet-50',  labelClass: 'text-violet-700' },
+  IMPORTANT: { label: '重要',   icon: '❗',  borderClass: 'border-blue-500',    bgClass: 'bg-blue-50',    labelClass: 'text-blue-700' },
   WARNING:   { label: '注意',   icon: '⚠️',  borderClass: 'border-amber-400',   bgClass: 'bg-amber-50',   labelClass: 'text-amber-700' },
   CAUTION:   { label: '警告',   icon: '🚫',  borderClass: 'border-red-400',     bgClass: 'bg-red-50',     labelClass: 'text-red-700' },
 };
+
+function CodeBlock({ children, node }: { children?: ReactNode; node?: Record<string, unknown> }) {
+  const [copied, setCopied] = useState(false);
+
+  const codeNode = node?.children as Array<{ children?: Array<{ value?: string }> }> | undefined;
+  const codeText = codeNode?.[0]?.children?.map((c) => c.value ?? '').join('') ?? '';
+
+  function copy() {
+    navigator.clipboard.writeText(codeText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="relative group mb-4">
+      <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:text-sm">
+        {children}
+      </pre>
+      <button
+        onClick={copy}
+        aria-label="コードをコピー"
+        className="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-slate-600 text-slate-300 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity hover:bg-slate-500"
+      >
+        {copied ? 'コピー済み ✓' : 'コピー'}
+      </button>
+    </div>
+  );
+}
 
 function textContent(node: ReactNode): string {
   if (typeof node === 'string') return node;
@@ -43,9 +73,10 @@ function createHeading(
     const text = textContent(children);
     const id = slugify(text);
     return (
-      <Tag id={id} className={`${className} scroll-mt-20`}>
+      <Tag id={id} className={`${className} scroll-mt-20 group`}>
         <a href={`#${id}`} className="no-underline text-inherit hover:text-inherit">
           {children}
+          <span className="ml-2 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 text-base font-normal select-none" aria-hidden="true">#</span>
         </a>
       </Tag>
     );
@@ -53,23 +84,23 @@ function createHeading(
 }
 
 const components: Components = {
-  h1: createHeading('h1', 'text-3xl font-bold mb-6 text-gray-900'),
+  h1: createHeading('h1', 'text-3xl font-bold mb-6 text-slate-900'),
   h2: createHeading(
     'h2',
-    'text-2xl font-semibold mb-4 mt-10 pb-2 border-b border-slate-200 text-gray-800',
+    'text-2xl font-semibold mb-4 mt-10 pb-2 border-b border-slate-200 text-slate-800',
   ),
-  h3: createHeading('h3', 'text-xl font-medium mb-3 mt-6 text-gray-700'),
-  h4: createHeading('h4', 'text-lg font-medium mb-2 mt-5 text-gray-700'),
+  h3: createHeading('h3', 'text-xl font-medium mb-3 mt-6 text-slate-700'),
+  h4: createHeading('h4', 'text-lg font-medium mb-2 mt-5 text-slate-700'),
   p: ({ children }) => (
-    <p className="mb-4 text-gray-600 leading-relaxed">{children}</p>
+    <p className="mb-4 text-slate-600 leading-relaxed">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc list-inside mb-4 space-y-1.5 text-gray-600">
+    <ul className="list-disc list-inside mb-4 space-y-1.5 text-slate-600">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside mb-4 space-y-1.5 text-gray-600">
+    <ol className="list-decimal list-inside mb-4 space-y-1.5 text-slate-600">
       {children}
     </ol>
   ),
@@ -85,7 +116,7 @@ const components: Components = {
             type="checkbox"
             checked={checked}
             readOnly
-            className="mt-1 size-4 rounded border-gray-300"
+            className="mt-1 size-4 rounded border-slate-300"
           />
           <span>{children}</span>
         </li>
@@ -100,7 +131,7 @@ const components: Components = {
           type="checkbox"
           checked={checked}
           readOnly
-          className="size-4 rounded border-gray-300 mr-2"
+          className="size-4 rounded border-slate-300 mr-2"
           {...props}
         />
       );
@@ -115,14 +146,10 @@ const components: Components = {
       Array.isArray(code?.properties?.className) &&
       (code.properties.className as string[]).includes('language-mermaid');
     if (isMermaid) return <>{children}</>;
-    return (
-      <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg mb-4 overflow-x-auto text-sm font-mono leading-relaxed [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:text-sm">
-        {children}
-      </pre>
-    );
+    return <CodeBlock node={node as unknown as Record<string, unknown>}>{children}</CodeBlock>;
   },
   code: ({ children, className }) => {
-    if (className === 'language-mermaid') {
+    if (className?.includes('language-mermaid')) {
       return <MermaidDiagram code={String(children).trimEnd()} />;
     }
     if (className?.includes('language-')) {
@@ -156,16 +183,24 @@ const components: Components = {
       {children}
     </td>
   ),
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      className="text-blue-600 hover:text-blue-800 underline"
-      target={href?.startsWith('http') ? '_blank' : undefined}
-      rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
-    >
-      {children}
-    </a>
-  ),
+  a: ({ href, children }) => {
+    const isExternal = href?.startsWith('http');
+    return (
+      <a
+        href={href}
+        className="text-blue-600 hover:text-blue-800 underline inline-flex items-center gap-0.5"
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
+        {children}
+        {isExternal && (
+          <svg xmlns="http://www.w3.org/2000/svg" className="inline size-3 shrink-0 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        )}
+      </a>
+    );
+  },
   blockquote: ({ children, node }) => {
     const classNames = node?.properties?.className;
     const classList = Array.isArray(classNames) ? classNames.map(String) : [];
@@ -188,7 +223,7 @@ const components: Components = {
     }
 
     return (
-      <blockquote className="border-l-4 border-amber-400 bg-amber-50 pl-4 py-2 text-gray-600 my-4 rounded-r">
+      <blockquote className="border-l-4 border-slate-300 bg-slate-50 pl-4 py-2 text-slate-600 my-4 rounded-r">
         {children}
       </blockquote>
     );
@@ -201,6 +236,7 @@ const components: Components = {
     <img
       src={src}
       alt={alt ?? ''}
+      loading="lazy"
       className="max-w-full rounded-lg my-4 shadow"
     />
   ),
@@ -208,7 +244,7 @@ const components: Components = {
 
 export function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm, remarkAlerts]} components={components}>
+    <ReactMarkdown remarkPlugins={[remarkGfm, remarkAlerts]} rehypePlugins={[rehypeHighlight]} components={components}>
       {content}
     </ReactMarkdown>
   );
