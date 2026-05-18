@@ -3,6 +3,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { slugify } from '@/lib/markdown';
 import { MermaidDiagram } from '@/components/MermaidDiagram';
@@ -23,6 +24,34 @@ const ALERT_CONFIG: Record<AlertType, {
   WARNING:   { label: '注意',   icon: '⚠️',  borderClass: 'border-amber-400',   bgClass: 'bg-amber-50',   labelClass: 'text-amber-700' },
   CAUTION:   { label: '警告',   icon: '🚫',  borderClass: 'border-red-400',     bgClass: 'bg-red-50',     labelClass: 'text-red-700' },
 };
+
+function CodeBlock({ children, node }: { children?: ReactNode; node?: Record<string, unknown> }) {
+  const [copied, setCopied] = useState(false);
+
+  const codeNode = node?.children as Array<{ children?: Array<{ value?: string }> }> | undefined;
+  const codeText = codeNode?.[0]?.children?.map((c) => c.value ?? '').join('') ?? '';
+
+  function copy() {
+    navigator.clipboard.writeText(codeText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="relative group mb-4">
+      <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm font-mono leading-relaxed [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:text-sm">
+        {children}
+      </pre>
+      <button
+        onClick={copy}
+        aria-label="コードをコピー"
+        className="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-slate-600 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-500"
+      >
+        {copied ? 'コピー済み ✓' : 'コピー'}
+      </button>
+    </div>
+  );
+}
 
 function textContent(node: ReactNode): string {
   if (typeof node === 'string') return node;
@@ -115,11 +144,7 @@ const components: Components = {
       Array.isArray(code?.properties?.className) &&
       (code.properties.className as string[]).includes('language-mermaid');
     if (isMermaid) return <>{children}</>;
-    return (
-      <pre className="bg-slate-800 text-slate-100 p-4 rounded-lg mb-4 overflow-x-auto text-sm font-mono leading-relaxed [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:text-sm">
-        {children}
-      </pre>
-    );
+    return <CodeBlock node={node as Record<string, unknown>}>{children}</CodeBlock>;
   },
   code: ({ children, className }) => {
     if (className === 'language-mermaid') {
