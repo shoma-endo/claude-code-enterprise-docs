@@ -38,7 +38,7 @@ export function TrainingPage({ intro, prep, session1, session2, session3, tocByT
 
       <article className="mx-auto min-w-0 max-w-5xl xl:mx-0 xl:max-w-none">
         <nav
-          className="mb-8 flex gap-0 border-b border-slate-200"
+          className="sticky top-0 z-10 mb-8 flex gap-0 border-b border-slate-200 bg-white"
           role="tablist"
           aria-label="研修セッション"
         >
