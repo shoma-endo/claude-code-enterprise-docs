@@ -215,7 +215,7 @@ const components: Components = {
     }
 
     return (
-      <blockquote className="border-l-4 border-amber-400 bg-amber-50 pl-4 py-2 text-slate-600 my-4 rounded-r">
+      <blockquote className="border-l-4 border-slate-300 bg-slate-50 pl-4 py-2 text-slate-600 my-4 rounded-r">
         {children}
       </blockquote>
     );
