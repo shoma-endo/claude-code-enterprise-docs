@@ -73,7 +73,7 @@ export function TrainingPage({ intro, prep, session1, session2, session3, tocByT
         <nav
           className="sticky top-0 z-10 mb-8 flex gap-0 border-b border-slate-200 bg-white"
           role="tablist"
-          aria-label="研修セッション"
+          aria-label="1Day 研修セッション"
         >
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: 'Claude Code Personal Docs',
     template: '%s | Claude Code Personal Docs',
   },
-  description: 'Claude Code のドキュメント・ハンズオン研修資料（claude-code-personal-docs）',
+  description: 'Claude Code 個人向け 1Day 研修資料（claude-code-personal-docs）',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
