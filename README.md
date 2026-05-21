@@ -71,3 +71,28 @@ lib/
 1. `app/` 配下に新しいルートを作成
 2. サーバーコンポーネントで Markdown ファイルを読み込み（`fs/promises`）
 3. `MarkdownRenderer` + `TocSidebar` を組み合わせて、`app/page.tsx` のパターンに従い描画
+
+## Git リモート（enterprise / personal）
+
+このリポジトリは GitHub 上の 2 リポジトリと連携する。
+
+| リモート名 | 用途 | URL |
+|-----------|------|-----|
+| `origin` | 法人向け（enterprise） | https://github.com/shoma-endo/claude-code-enterprise-docs |
+| `personal` | 個人用（personal） | git@github.com:shoma-endo/claude-code-personal-docs |
+
+`main` の上流は `origin/main`（enterprise）。日常の `git pull` / `git push` は enterprise 向け。
+
+```bash
+# enterprise のみ
+git push origin
+
+# personal のみ
+git push personal
+
+# 両方まとめて（エイリアス）
+git push-all
+
+# 両方から取得
+git fetch-all
+```
