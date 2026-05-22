@@ -21,7 +21,7 @@ const ALERT_CONFIG: Record<AlertType, {
 }> = {
   NOTE:      { label: '補足',   icon: 'ℹ️',  borderClass: 'border-slate-400',   bgClass: 'bg-slate-50',   labelClass: 'text-slate-600' },
   TIP:       { label: 'ヒント', icon: '💡',  borderClass: 'border-emerald-400', bgClass: 'bg-emerald-50', labelClass: 'text-emerald-700' },
-  IMPORTANT: { label: '重要',   icon: '❗',  borderClass: 'border-orange-500',  bgClass: 'bg-orange-50',  labelClass: 'text-orange-700' },
+  IMPORTANT: { label: '重要',   icon: '❗',  borderClass: 'border-violet-500',  bgClass: 'bg-violet-50',  labelClass: 'text-violet-700' },
   WARNING:   { label: '注意',   icon: '⚠️',  borderClass: 'border-amber-400',   bgClass: 'bg-amber-50',   labelClass: 'text-amber-700' },
   CAUTION:   { label: '警告',   icon: '🚫',  borderClass: 'border-red-400',     bgClass: 'bg-red-50',     labelClass: 'text-red-700' },
 };
