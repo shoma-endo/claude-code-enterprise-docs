@@ -1,8 +1,6 @@
-# Claude Code Personal Docs
+# Claude Code Enterprise Docs
 
-Claude Code **個人向け 1Day 研修**の資料を配信する Next.js 15 製の Web サイト（リポジトリ名: `claude-code-personal-docs`）です。
-
-研修の本文・演習・到達目標は **これから策定** します。現時点では骨組み（概要 / 事前準備 / Session 1–3）のみを置いています。
+Claude Code の法人向けドキュメント・ハンズオン研修資料を提供する Next.js 15 製の Web サイトです。
 
 ## 技術スタック
 
@@ -28,9 +26,9 @@ lint・テストスクリプトは未設定。
 
 ## アーキテクチャ
 
-**データフロー**: 研修コンテンツは `docs/training/` 配下の Markdown で管理。サーバーコンポーネント `app/page.tsx` がリクエスト時に `fs/promises` でファイルを読み込み、`lib/markdown.ts` の `splitTrainingSections` で `intro` / `prep` / `session1` / `session2` の 4 セクションに分割、各セクションごとに `extractToc` で目次を抽出してクライアントコンポーネント `TrainingPage` に渡す。分割に失敗した場合は単一ページとしてそのまま描画する。
+**データフロー**: 研修コンテンツは `docs/training/` 配下の Markdown で管理。サーバーコンポーネント `app/page.tsx` がリクエスト時に `fs/promises` でファイルを読み込み、`lib/markdown.ts` の `splitTrainingSections` で `intro` / `prep` / `session1` / `session2` / `session3` の 5 セクションに分割、各セクションごとに `extractToc` で目次を抽出してクライアントコンポーネント `TrainingPage` に渡す。分割に失敗した場合は単一ページとしてそのまま描画する。
 
-**UI**: `TrainingPage` は「概要 & 事前準備」「Session 1」「Session 2」のタブ式（1Day 研修の時間ブロック想定）。現在のタブは `?tab=` クエリパラメータと同期する。`xl` 以上では右側に sticky な目次サイドバー、`xl` 未満では右下に浮かぶフローティングボタンからドロワー目次を開く。
+**UI**: `TrainingPage` は「概要 & 事前準備」「Session 1」「Session 2」「Session 3」のタブ式で、現在のタブは `?tab=` クエリパラメータと同期する。`xl` 以上では右側に sticky な目次サイドバー、`xl` 未満では右下に浮かぶフローティングボタンからドロワー目次を開く。
 
 ## ディレクトリ構成
 
@@ -46,9 +44,7 @@ components/
   TocSidebar.tsx        # 目次サイドバー（IntersectionObserver）
   MermaidDiagram.tsx    # Mermaid 図のレンダラー
 docs/
-  training/
-    claude-code-personal/
-      claude-code-personal-training.md   # 1Day 個人研修の本体（編集対象）
+  training/             # トレーニング用 Markdown コンテンツ
 lib/
   markdown.ts           # slugify / extractToc / splitTrainingSections
   remark-alerts.ts      # GitHub 風アラート構文を blockquote のクラスへ変換する remark プラグイン
@@ -63,40 +59,15 @@ lib/
 - **`components/TocSidebar.tsx`** — `IntersectionObserver` でアクティブな見出しをハイライト。`xl` ブレークポイント以上で sticky 表示。
 - **`components/TrainingPage.tsx`** — タブ切り替えとモバイル用ドロワー目次を担うクライアントコンポーネント。`## 事前準備` セクションは概要タブ内で左 blue ボーダー＋ slate 背景のコールアウトに包んで表示する。タブを切り替えると `TocSidebar` は `key` 変更により再マウントされ、スクロール位置とアクティブ見出しがリセットされる。
 
-## コンテンツの編集
+## コンテンツの追加
 
-1Day 個人研修の本文は次を編集する:
-
-`docs/training/claude-code-personal/claude-code-personal-training.md`
-
-`splitTrainingSections` が依存しているため、タブ分割を維持する場合は以下の見出しを変更しないこと:
+研修 Markdown を更新する場合は `docs/training/claude-code-corporate/claude-code-corporate-training.md` を編集する。`splitTrainingSections` が依存しているため、以下の見出しを変更しないこと:
 
 - `## 事前準備`
-- `## Session 1 — …` / `## Session 2 — …`（各 Session の直前に `---` 区切りが必要）
+- `## Session 1 — …` / `## Session 2 — …` / `## Session 3 — …`（前後に `---` 区切りが必要）
 
-別形式（単一ページのみ）にする場合は、上記見出しを外せば `app/page.tsx` が単一ページモードで描画する。
+新しいドキュメントページを追加するには:
 
-## Git リモート（personal / enterprise）
-
-このリポジトリは GitHub 上の 2 リポジトリと連携する。
-
-| リモート名 | 用途 | URL |
-|-----------|------|-----|
-| `origin` | 本番（personal） | https://github.com/shoma-endo/claude-code-personal-docs |
-| `enterprise` | ミラー（enterprise） | https://github.com/shoma-endo/claude-code-enterprise-docs |
-
-`main` の上流は `origin/main`（personal）。日常の `git pull` / `git push` は personal 向け。
-
-```bash
-# personal のみ（デフォルト）
-git push origin
-
-# enterprise のみ
-git push enterprise
-
-# 両方まとめて（エイリアス）
-git push-all
-
-# 両方から取得
-git fetch-all
-```
+1. `app/` 配下に新しいルートを作成
+2. サーバーコンポーネントで Markdown ファイルを読み込み（`fs/promises`）
+3. `MarkdownRenderer` + `TocSidebar` を組み合わせて、`app/page.tsx` のパターンに従い描画

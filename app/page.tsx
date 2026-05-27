@@ -9,7 +9,7 @@ import { TocSidebar } from '@/components/TocSidebar';
 export default async function HomePage() {
   const filePath = join(
     process.cwd(),
-    'docs/training/claude-code-personal/claude-code-personal-training.md',
+    'docs/training/claude-code-corporate/claude-code-corporate-training.md',
   );
   const content = await readFile(filePath, 'utf-8');
   const sections = splitTrainingSections(content);
@@ -33,6 +33,7 @@ export default async function HomePage() {
     overview: [...extractToc(sections.intro), ...extractToc(sections.prep)],
     session1: extractToc(sections.session1),
     session2: extractToc(sections.session2),
+    session3: extractToc(sections.session3),
   };
 
   return <TrainingPage {...sections} tocByTab={tocByTab} />;

@@ -18,16 +18,16 @@ const shippori = Shippori_Mincho({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Claude Code Personal Docs',
-    template: '%s | Claude Code Personal Docs',
+    default: 'Claude Code Enterprise Docs',
+    template: '%s | Claude Code Enterprise Docs',
   },
-  description: 'Claude Code 個人向け 1Day 研修資料（claude-code-personal-docs）',
+  description: 'Claude Code の法人向けドキュメント・ハンズオン研修資料を集約したリポジトリ',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" className={`${zenKaku.variable} ${shippori.variable}`}>
-      <body className="bg-orange-50 text-slate-900 font-sans">
+      <body className="bg-white text-slate-900 font-sans">
         {children}
       </body>
     </html>
